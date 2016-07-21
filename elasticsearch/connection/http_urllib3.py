@@ -29,7 +29,7 @@ class Urllib3HttpConnection(Connection):
 
         self.pool = pool_class(host, port=port, timeout=self.timeout, maxsize=maxsize)
 
-    def perform_request(self, method, url, params=None, body=None, timeout=None, ignore=()):
+    def perform_request(self, method, url, params=None, body=None, timeout=None, ignore=(), do_not_decode=False):
         url = self.url_prefix + url
         if params:
             url = '%s?%s' % (url, urlencode(params or {}))
@@ -45,7 +45,7 @@ class Urllib3HttpConnection(Connection):
                 headers['content-length'] = str(len(body))
             response = self.pool.urlopen(method, url, body, retries=False, headers=headers, **kw)
             duration = time.time() - start
-            raw_data = response.data.decode('utf-8')
+            raw_data = response.data if do_not_decode else response.data.decode('utf-8')
         except Exception as e:
             self.log_request_fail(method, full_url, body, time.time() - start, exception=e)
             raise ConnectionError('N/A', str(e), e)

@@ -219,7 +219,7 @@ class Transport(object):
         if self.sniff_on_connection_fail:
             self.sniff_hosts()
 
-    def perform_request(self, method, url, params=None, body=None):
+    def perform_request(self, method, url, params=None, body=None, do_not_decode=False):
         """
         Perform the actual request. Retrieve a connection from the connection
         pool, pass all the information to it's perform_request method and
@@ -273,7 +273,7 @@ class Transport(object):
             connection = self.get_connection()
 
             try:
-                status, headers, data = connection.perform_request(method, url, params, body, ignore=ignore, timeout=timeout)
+                status, headers, data = connection.perform_request(method, url, params, body, ignore=ignore, timeout=timeout, do_not_decode=do_not_decode)
             except ConnectionError:
                 self.mark_dead(connection)
 
