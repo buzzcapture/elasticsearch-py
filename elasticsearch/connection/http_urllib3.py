@@ -55,7 +55,7 @@ class Urllib3HttpConnection(Connection):
 
         self.pool = pool_class(host, port=port, timeout=self.timeout, maxsize=maxsize, **kw)
 
-    def perform_request(self, method, url, params=None, body=None, timeout=None, ignore=()):
+    def perform_request(self, method, url, params=None, body=None, timeout=None, ignore=(), do_not_decode=False):
         url = self.url_prefix + url
         if params:
             url = '%s?%s' % (url, urlencode(params))
@@ -77,7 +77,7 @@ class Urllib3HttpConnection(Connection):
 
             response = self.pool.urlopen(method, url, body, retries=False, headers=self.headers, **kw)
             duration = time.time() - start
-            raw_data = response.data.decode('utf-8')
+            raw_data = response.data if do_not_decode else response.data.decode('utf-8')
         except UrllibSSLError as e:
             self.log_request_fail(method, full_url, body, time.time() - start, exception=e)
             raise SSLError('N/A', str(e), e)
